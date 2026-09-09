@@ -84,51 +84,54 @@ def check_ip(ip):
         print(f"[-] IP {ip} is not blocked.")
     else:
         print(f"[+] IP {ip} is currently blocked.")
+def main():
+    while True:
+        print("\n================================")
+        print("       PYTHON FIREWALL")
+        print("          v1.0")
+        print("================================")
+        print("--------------------------------")
+        print("1. Block IP")
+        print("2. Unblock IP")
+        print("3. Check IP Status")
+        print("4. Exit")
+        print("--------------------------------")
 
-while True:
-    print("\n================================")
-    print("       PYTHON FIREWALL")
-    print("          v1.0")
-    print("================================")
-    print("--------------------------------")
-    print("1. Block IP")
-    print("2. Unblock IP")
-    print("3. Check IP Status")
-    print("4. Exit")
-    print("--------------------------------")
+        choice = input("Enter your choice: ").strip()
 
-    choice = input("Enter your choice: ").strip()
+        if choice == "1":
+            ip = input("Enter IP to block: ").strip()
 
-    if choice == "1":
-        ip = input("Enter IP to block: ").strip()
+            try:
+                ipaddress.ip_address(ip)
+                block_ip(ip)
+            except ValueError:
+                print("[!] Invalid IP address.")
 
-        try:
-            ipaddress.ip_address(ip)
-            block_ip(ip)
-        except ValueError:
-            print("[!] Invalid IP address.")
+        elif choice == "2":
+            ip = input("Enter IP to unblock: ").strip()
 
-    elif choice == "2":
-        ip = input("Enter IP to unblock: ").strip()
+            try:
+                ipaddress.ip_address(ip)
+                unblock_ip(ip)
+            except ValueError:
+                print("[!] Invalid IP address.")
 
-        try:
-            ipaddress.ip_address(ip)
-            unblock_ip(ip)
-        except ValueError:
-            print("[!] Invalid IP address.")
+        elif choice == "3":
+            ip = input("Enter IP to check: ").strip()
 
-    elif choice == "3":
-        ip = input("Enter IP to check: ").strip()
+            try:
+                ipaddress.ip_address(ip)
+                check_ip(ip)
+            except ValueError:
+                print("[!] Invalid IP address.")
 
-        try:
-            ipaddress.ip_address(ip)
-            check_ip(ip)
-        except ValueError:
-            print("[!] Invalid IP address.")
+        elif choice == "4":
+            print("\n[+] Exiting Python Firewall...")
+            break
 
-    elif choice == "4":
-        print("\n[+] Exiting Python Firewall...")
-        break
+        else:
+            print(f"[!] Invalid choice: {choice}")
 
-    else:
-        print(f"[!] Invalid choice: {choice}")
+if __name__ == "__main__":
+    main()
