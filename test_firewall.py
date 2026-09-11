@@ -95,3 +95,22 @@ def test_unblock_ip(monkeypatch, capsys):
     assert "8.8.8.8 unblocked successfully" in captured.out
     assert any("delete rule" in command for command in commands)
     assert any('name="PYFW_BLOCK_8.8.8.8"' in command for command in commands)
+
+def test_check_ip(monkeypatch, capsys):
+    import firewall
+
+    class FakeResult:
+        returncode = 0
+        stdout = "Rule Name: PYFW_BLOCK_8.8.8.8"
+        stderr = ""
+
+    def fake_run(command, **kwargs):
+        return FakeResult()
+
+    monkeypatch.setattr(firewall.subprocess, "run", fake_run)
+
+    firewall.check_ip("8.8.8.8")
+
+    captured = capsys.readouterr()
+
+    assert "8.8.8.8 is currently blocked" in captured.out
