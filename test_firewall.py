@@ -42,7 +42,7 @@ def test_block_ip(monkeypatch, capsys):
     assert "8.8.8.8 blocked successfully" in captured.out
     assert any("remoteip=8.8.8.8" in command for command in commands)
 
-    
+
 def test_block_ip(monkeypatch, capsys):
     import firewall
 
@@ -71,3 +71,27 @@ def test_block_ip(monkeypatch, capsys):
 
     assert "8.8.8.8 blocked successfully" in captured.out
     assert any("remoteip=8.8.8.8" in command for command in commands)
+    
+def test_unblock_ip(monkeypatch, capsys):
+    import firewall
+
+    commands = []
+
+    class FakeResult:
+        returncode = 0
+        stdout = "Deleted 1 rule(s)."
+        stderr = ""
+
+    def fake_run(command, **kwargs):
+        commands.append(command)
+        return FakeResult()
+
+    monkeypatch.setattr(firewall.subprocess, "run", fake_run)
+
+    firewall.unblock_ip("8.8.8.8")
+
+    captured = capsys.readouterr()
+
+    assert "8.8.8.8 unblocked successfully" in captured.out
+    assert any("delete rule" in command for command in commands)
+    assert any('name="PYFW_BLOCK_8.8.8.8"' in command for command in commands)
