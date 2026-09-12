@@ -96,4 +96,4 @@ def test_log_event(tmp_path, monkeypatch):
 
     firewall.log_event("BLOCK", "8.8.8.8", "SUCCESS")
 
-    assert log_file.read_text() == "BLOCK | 8.8.8.8 | SUCCESS\n"
+    assert " | BLOCK | 8.8.8.8 | SUCCESS\n" in log_file.read_text()

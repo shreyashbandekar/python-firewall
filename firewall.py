@@ -1,9 +1,12 @@
 import subprocess
 import ipaddress
+from datetime import datetime
 
 def log_event(action, ip, status):
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
     with open("firewall.log", "a") as log_file:
-        log_file.write(f"{action} | {ip} | {status}\n")
+        log_file.write(f"{timestamp} | {action} | {ip} | {status}\n")
 
 
 
