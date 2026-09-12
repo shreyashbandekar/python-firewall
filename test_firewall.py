@@ -86,3 +86,14 @@ def test_check_ip(monkeypatch, capsys):
     captured = capsys.readouterr()
 
     assert "8.8.8.8 is currently blocked" in captured.out
+
+def test_log_event(tmp_path, monkeypatch):
+    import firewall
+
+    log_file = tmp_path / "firewall.log"
+
+    monkeypatch.chdir(tmp_path)
+
+    firewall.log_event("BLOCK", "8.8.8.8", "SUCCESS")
+
+    assert log_file.read_text() == "BLOCK | 8.8.8.8 | SUCCESS\n"

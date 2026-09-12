@@ -1,5 +1,13 @@
 import subprocess
 import ipaddress
+
+def log_event(action, ip, status):
+    with open("firewall.log", "a") as log_file:
+        log_file.write(f"{action} | {ip} | {status}\n")
+
+
+
+
 def is_valid_ip(ip):
     try:
         ipaddress.ip_address(ip)
@@ -43,9 +51,11 @@ def block_ip(ip):
 
     if result.returncode == 0:
         print(f"[+] IP {ip} blocked successfully.")
+        log_event("BLOCK", ip, "SUCCESS")
     else:
         print(f"[!] Failed to block IP {ip}.")
         print(result.stdout.strip())
+        log_event("BLOCK", ip, "FAILED")
     
 def unblock_ip(ip):
     rule_name = f"PYFW_BLOCK_{ip}"
@@ -66,8 +76,10 @@ def unblock_ip(ip):
         print(f"[!] No firewall rule found for IP {ip}.")
     elif result.returncode == 0:
         print(f"[-] IP {ip} unblocked successfully.")
+        log_event("UNBLOCK", ip, "SUCCESS")
     else:
         print(f"[!] Failed to unblock IP {ip}.")
+        log_event("UNBLOCK", ip, "FAILED")
 
 
 def check_ip(ip):
