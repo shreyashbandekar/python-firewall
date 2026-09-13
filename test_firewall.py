@@ -97,3 +97,22 @@ def test_log_event(tmp_path, monkeypatch):
     firewall.log_event("BLOCK", "8.8.8.8", "SUCCESS")
 
     assert " | BLOCK | 8.8.8.8 | SUCCESS\n" in log_file.read_text()
+
+
+def test_log_csv_event(tmp_path, monkeypatch):
+    import firewall
+
+    csv_file = tmp_path / "firewall_events.csv"
+
+    monkeypatch.chdir(tmp_path)
+
+    csv_file.write_text("timestamp,action,ip,status\n")
+
+    firewall.log_csv_event("BLOCK", "8.8.8.8", "SUCCESS")
+
+    lines = csv_file.read_text().splitlines()
+
+    assert lines[0] == "timestamp,action,ip,status"
+    assert "BLOCK" in lines[1]
+    assert "8.8.8.8" in lines[1]
+    assert "SUCCESS" in lines[1]

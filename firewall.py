@@ -1,5 +1,6 @@
 import subprocess
 import ipaddress
+import csv
 from datetime import datetime
 
 def log_event(action, ip, status):
@@ -8,7 +9,12 @@ def log_event(action, ip, status):
     with open("firewall.log", "a") as log_file:
         log_file.write(f"{timestamp} | {action} | {ip} | {status}\n")
 
+def log_csv_event(action, ip, status):
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
+    with open("firewall_events.csv", "a", newline="") as csv_file:
+        writer = csv.writer(csv_file)
+        writer.writerow([timestamp, action, ip, status])
 
 
 def is_valid_ip(ip):
@@ -55,6 +61,7 @@ def block_ip(ip):
     if result.returncode == 0:
         print(f"[+] IP {ip} blocked successfully.")
         log_event("BLOCK", ip, "SUCCESS")
+        log_csv_event("BLOCK", ip, "SUCCESS")
     else:
         print(f"[!] Failed to block IP {ip}.")
         print(result.stdout.strip())
@@ -80,6 +87,7 @@ def unblock_ip(ip):
     elif result.returncode == 0:
         print(f"[-] IP {ip} unblocked successfully.")
         log_event("UNBLOCK", ip, "SUCCESS")
+        log_csv_event("UNBLOCK", ip, "SUCCESS")
     else:
         print(f"[!] Failed to unblock IP {ip}.")
         log_event("UNBLOCK", ip, "FAILED")

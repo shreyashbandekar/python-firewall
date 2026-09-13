@@ -5,3 +5,4 @@ venv/
 .env
 .vscode/
 firewall.log
+firewall_events.csv
