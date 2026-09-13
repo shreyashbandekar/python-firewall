@@ -148,3 +148,18 @@ def test_view_logs_file_not_found(tmp_path, monkeypatch, capsys):
     captured = capsys.readouterr()
 
     assert "[!] No firewall event log found." in captured.out
+
+
+def test_log_csv_event_creates_header(tmp_path, monkeypatch):
+    import csv
+    import firewall
+
+    monkeypatch.chdir(tmp_path)
+
+    firewall.log_csv_event("BLOCK", "8.8.8.8", "SUCCESS")
+
+    with open("firewall_events.csv", "r", newline="") as csv_file:
+        rows = list(csv.reader(csv_file))
+
+    assert rows[0] == ["timestamp", "action", "ip", "status"]
+    assert rows[1][1:] == ["BLOCK", "8.8.8.8", "SUCCESS"]

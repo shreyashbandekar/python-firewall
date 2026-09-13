@@ -12,8 +12,20 @@ def log_event(action, ip, status):
 def log_csv_event(action, ip, status):
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
+    file_exists = False
+
+    try:
+        with open("firewall_events.csv", "r"):
+            file_exists = True
+    except FileNotFoundError:
+        pass
+
     with open("firewall_events.csv", "a", newline="") as csv_file:
         writer = csv.writer(csv_file)
+
+        if not file_exists:
+            writer.writerow(["timestamp", "action", "ip", "status"])
+
         writer.writerow([timestamp, action, ip, status])
 
 def view_logs():
