@@ -116,3 +116,23 @@ def test_log_csv_event(tmp_path, monkeypatch):
     assert "BLOCK" in lines[1]
     assert "8.8.8.8" in lines[1]
     assert "SUCCESS" in lines[1]
+
+def test_view_logs(tmp_path, monkeypatch, capsys):
+    import firewall
+
+    csv_file = tmp_path / "firewall_events.csv"
+
+    monkeypatch.chdir(tmp_path)
+
+    csv_file.write_text(
+        "timestamp,action,ip,status\n"
+        "2026-09-13 17:00:00,BLOCK,8.8.8.8,SUCCESS\n"
+    )
+
+    firewall.view_logs()
+
+    captured = capsys.readouterr()
+
+    assert "BLOCK" in captured.out
+    assert "8.8.8.8" in captured.out
+    assert "SUCCESS" in captured.out

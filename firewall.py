@@ -16,6 +16,16 @@ def log_csv_event(action, ip, status):
         writer = csv.writer(csv_file)
         writer.writerow([timestamp, action, ip, status])
 
+def view_logs():
+    try:
+        with open("firewall_events.csv", "r", newline="") as csv_file:
+            reader = csv.reader(csv_file)
+
+            for row in reader:
+                print(" | ".join(row))
+
+    except FileNotFoundError:
+        print("[!] No firewall event log found.")
 
 def is_valid_ip(ip):
     try:
@@ -115,6 +125,8 @@ def check_ip(ip):
         print(f"[-] IP {ip} is not blocked.")
     else:
         print(f"[+] IP {ip} is currently blocked.")
+
+
 def main():
     while True:
         print("\n================================")
@@ -125,7 +137,8 @@ def main():
         print("1. Block IP")
         print("2. Unblock IP")
         print("3. Check IP Status")
-        print("4. Exit")
+        print("4. View Event Logs")
+        print("5. Exit")
         print("--------------------------------")
 
         choice = input("Enter your choice: ").strip()
@@ -158,6 +171,9 @@ def main():
                 print("[!] Invalid IP address.")
 
         elif choice == "4":
+            view_logs()
+
+        elif choice == "5":
             print("\n[+] Exiting Python Firewall...")
             break
 
