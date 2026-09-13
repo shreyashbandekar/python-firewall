@@ -136,3 +136,15 @@ def test_view_logs(tmp_path, monkeypatch, capsys):
     assert "BLOCK" in captured.out
     assert "8.8.8.8" in captured.out
     assert "SUCCESS" in captured.out
+
+
+def test_view_logs_file_not_found(tmp_path, monkeypatch, capsys):
+    import firewall
+
+    monkeypatch.chdir(tmp_path)
+
+    firewall.view_logs()
+
+    captured = capsys.readouterr()
+
+    assert "[!] No firewall event log found." in captured.out
