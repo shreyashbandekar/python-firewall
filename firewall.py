@@ -66,6 +66,7 @@ def block_ip(ip):
         print(f"[!] Failed to block IP {ip}.")
         print(result.stdout.strip())
         log_event("BLOCK", ip, "FAILED")
+        log_csv_event("BLOCK", ip, "FAILED")
     
 def unblock_ip(ip):
     rule_name = f"PYFW_BLOCK_{ip}"
@@ -91,6 +92,8 @@ def unblock_ip(ip):
     else:
         print(f"[!] Failed to unblock IP {ip}.")
         log_event("UNBLOCK", ip, "FAILED")
+        log_csv_event("UNBLOCK", ip, "FAILED")
+        
 
 
 def check_ip(ip):
