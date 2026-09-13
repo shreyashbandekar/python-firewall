@@ -119,7 +119,7 @@ def main():
     while True:
         print("\n================================")
         print("       PYTHON FIREWALL")
-        print("          v1.0")
+        print("          v1.3")
         print("================================")
         print("--------------------------------")
         print("1. Block IP")
