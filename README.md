@@ -1,431 +1,395 @@
 # 🛡️ Python Firewall
 
-A lightweight Python-based Windows Firewall management tool for blocking, unblocking, and checking the status of IP addresses through the Windows Firewall.
+A lightweight Windows Firewall management utility written in Python for blocking, unblocking, checking, and auditing IP-based firewall rules.
 
-**Current Version:** `v1.0`
+**Current Version:** `v2.0`
 
 ---
 
 ## 📌 Overview
 
-Python Firewall is a command-line security utility written in Python that provides a simple interface for managing Windows Firewall rules.
+Python Firewall provides a simple command-line interface for managing selected Windows Defender Firewall rules through `netsh advfirewall`.
 
-The application uses Python's `subprocess` module to interact with the Windows `netsh` firewall command and the `ipaddress` module to validate IP addresses before making firewall changes.
-
-This project is designed as a practical cybersecurity project for learning and demonstrating:
+The tool is designed as a practical cybersecurity project for learning and demonstrating:
 
 - Windows Firewall administration
-- Network security fundamentals
 - IP address validation
 - Firewall rule management
 - Python system administration
-- Command-line security tooling
-- Git and GitHub workflows
+- Security-focused CLI design
+- Event logging
+- Automated testing
+- GitHub Actions CI
+
+The application only manages rules created with the `PYFW_BLOCK_` prefix.
 
 ---
 
 ## ✨ Features
 
-- 🔒 Block an IP address
-- 🔓 Unblock an IP address
+- 🔒 Block IPv4 and IPv6 addresses
+- 🔓 Unblock managed IP rules
 - 🔎 Check IP blocking status
-- ✅ IPv4 and IPv6 address validation
-- 🛑 Prevent duplicate firewall rules
-- ⚠️ Graceful handling of missing firewall rules
-- 🖥️ Uses the native Windows Firewall
-- 💻 Interactive command-line interface
-- 🏷️ Consistent firewall rule naming
-- 📝 Clear success and error messages
+- 📋 List Python Firewall rules
+- 📝 CSV event logging
+- 🛑 Duplicate-rule protection
+- ⚠️ Safe handling of missing rules
+- ✅ IPv4 and IPv6 validation
+- 🔐 Administrator privilege enforcement by Windows
+- 🛡️ Safe `subprocess` argument handling without `shell=True`
+- 🧪 Automated unit tests
+- ⚙️ GitHub Actions CI
 
 ---
 
-## 🏷️ Firewall Rule Naming
+## 🖥️ CLI
 
-Firewall rules created by the application use the following naming convention:
+```text
+================================
+       PYTHON FIREWALL
+          v2.0
+================================
+1. Block IP
+2. Unblock IP
+3. Check IP Status
+4. List Firewall Rules
+5. View Event Logs
+6. Exit
+--------------------------------
+Enter your choice:
 
-`PYFW_BLOCK_<IP>`
-
-Example:
-
-`PYFW_BLOCK_203.0.113.50`
-
-This makes rules created by the application easy to identify and manage.
-
----
-
-## 🖥️ Application Menu
-
-When the application starts, it displays:
-
-    =================================
-           PYTHON FIREWALL
-              v1.0
-    =================================
-    --------------------------------
-    1. Block IP
-    2. Unblock IP
-    3. Check IP Status
-    4. Exit
-    --------------------------------
-    Enter your choice:
-
----
-
+```
 ## 🔒 Block an IP
 
-Select option `1` and provide the IP address you want to block.
-
-Example:
+Select option `1` and enter a valid IPv4 or IPv6 address.
 
     Enter your choice: 1
     Enter IP to block: 203.0.113.50
 
     [+] IP 203.0.113.50 blocked successfully.
 
-The application creates a Windows Firewall rule named:
+The tool creates a managed Windows Firewall rule using the naming format:
 
-    PYFW_BLOCK_203.0.113.50
+`PYFW_BLOCK_<IP>`
 
----
+For example:
 
-## 🔎 Check IP Status
-
-Select option `3` to determine whether an IP is currently blocked by a firewall rule created by the application.
-
-Example:
-
-    Enter your choice: 3
-    Enter IP to check: 203.0.113.50
-
-    [+] IP 203.0.113.50 is currently blocked.
-
-If the IP is not blocked:
-
-    [-] IP 203.0.113.50 is not blocked.
+`PYFW_BLOCK_203.0.113.50`
 
 ---
 
 ## 🔓 Unblock an IP
 
-Select option `2` to remove the firewall rule created for an IP.
-
-Example:
+Select option `2`:
 
     Enter your choice: 2
     Enter IP to unblock: 203.0.113.50
 
     [-] IP 203.0.113.50 unblocked successfully.
 
-If no matching firewall rule exists:
-
-    [!] No firewall rule found for IP 203.0.113.50.
+If no matching managed rule exists, the tool reports that the IP is not currently blocked.
 
 ---
+
+## 🔎 Check IP Status
+
+Select option `3`:
+
+    Enter your choice: 3
+    Enter IP to check: 203.0.113.50
+
+    [+] IP 203.0.113.50 is currently blocked.
+
+The status check only considers firewall rules created by this tool.
+
+## 📋 List Firewall Rules
+
+Select option `4` to display firewall rules created by Python Firewall.
+
+    Enter your choice: 4
+
+    Python Firewall Rules
+    ---------------------
+    Rule Name: PYFW_BLOCK_203.0.113.50
+
+Only rules using the `PYFW_BLOCK_` prefix are displayed.
+
+---
+
+## 📝 Event Logging
+
+Select option `5` to view the local firewall event log.
+
+    Enter your choice: 5
+
+The tool records:
+
+- Timestamp
+- Action
+- IP address
+- Result status
+
+Example:
+
+    timestamp | action | ip | status
+    2026-09-20 18:10:22 | BLOCK | 203.0.113.50 | SUCCESS
+    2026-09-20 18:11:05 | CHECK | 203.0.113.50 | BLOCKED
+    2026-09-20 18:12:14 | UNBLOCK | 203.0.113.50 | SUCCESS
+
+The log is stored locally as:
+
+`firewall_events.csv`
+
+This file is ignored by Git and is not committed to the repository.
 
 ## ⚙️ How It Works
 
-The application follows a simple workflow:
+Python Firewall acts as a lightweight interface around Windows Defender Firewall.
 
-    User
-      │
-      ▼
-    Python CLI
-      │
-      ▼
-    Validate IP Address
-      │
-      ▼
-    Check Firewall Rule
-      │
-      ▼
-    Windows Firewall
-      │
-      ▼
-    netsh advfirewall
-      │
-      ▼
-    Block / Unblock / Check
+The workflow is:
 
-### Block Workflow
+1. Validate the supplied IP address.
+2. Generate a unique managed rule name using `PYFW_BLOCK_`.
+3. Query Windows Firewall for an existing matching rule.
+4. Create or remove the rule using `netsh advfirewall`.
+5. Report the operation result.
+6. Record the event in `firewall_events.csv`.
 
-    User enters IP
-          ↓
-    Validate IP address
-          ↓
-    Check if rule already exists
-          ↓
-    Create firewall rule
-          ↓
-    Windows Firewall blocks inbound traffic
-
-### Unblock Workflow
-
-    User enters IP
-          ↓
-    Validate IP address
-          ↓
-    Find corresponding firewall rule
-          ↓
-    Delete firewall rule
-          ↓
-    Rule is removed
-
-### Status Workflow
-
-    User enters IP
-          ↓
-    Validate IP address
-          ↓
-    Search for corresponding firewall rule
-          ↓
-    Report current status
+The tool uses Python `subprocess` module to execute Windows Firewall commands with explicit argument lists.
 
 ---
 
-## 🧰 Technologies Used
+## 🛡️ Security Design
 
-| Technology | Purpose |
-|------------|---------|
-| Python | Application logic |
-| `subprocess` | Execute Windows firewall commands |
-| `ipaddress` | Validate IPv4 and IPv6 addresses |
-| `netsh` | Interface with Windows Firewall |
-| Windows Defender Firewall | Network traffic filtering |
-| Git | Version control |
-| GitHub | Source code hosting |
+The project follows several basic security principles:
+
+- Uses `ipaddress` for IP validation.
+- Uses list-based `subprocess` arguments.
+- Does not use `shell=True`.
+- Only manages rules created with the `PYFW_BLOCK_` prefix.
+- Handles duplicate rules safely.
+- Handles missing rules safely.
+- Records successful and failed operations.
+- Relies on Windows for administrator privilege enforcement.
+- Uses a local CSV file for event auditing.
+
+The tool does not attempt to bypass Windows security controls or elevate privileges automatically.
+
+## 👤 Administrator Privileges
+
+Windows Defender Firewall requires administrator privileges for rule-management operations.
+
+Run PowerShell or Command Prompt as **Administrator** before using the block and unblock functions.
+
+Example:
+
+    PS C:\Users\shrey\Desktop\Codes\python-firewall> python firewall.py
+
+If the program is started without sufficient privileges, Windows may reject firewall rule changes with an elevation error.
+
+Python Firewall does not attempt to bypass or automatically elevate Windows privileges.
+
+---
+
+## 🧰 Technologies
+
+- **Python 3**
+- **Windows Defender Firewall**
+- **`netsh advfirewall`**
+- **`ipaddress`**
+- **`subprocess`**
+- **CSV logging**
+- **pytest**
+- **GitHub Actions**
 
 ---
 
 ## 📋 Requirements
 
 - Windows 10 or Windows 11
-- Python 3.10 or newer
-- Administrator privileges
-- Git (recommended for development)
+- Python 3.9+
+- Administrator privileges for firewall rule changes
+- PowerShell or Command Prompt
 
-Python:
-
-https://www.python.org/
-
----
+No third-party runtime packages are required.
 
 ## 🚀 Installation
 
-### Clone the Repository
+Clone the repository:
 
     git clone https://github.com/shreyashbandekar/python-firewall.git
 
-### Enter the Project Directory
-
     cd python-firewall
 
-### Run the Application
-
-Open PowerShell or VS Code as Administrator and run:
+Run the application:
 
     python firewall.py
 
-Administrator privileges are required because the application modifies Windows Firewall rules.
+Run the automated tests:
 
----
+    python -m pytest -v
 
-## 🔐 Administrator Privileges
-
-Windows Firewall configuration requires elevated privileges.
-
-If the application cannot create or delete firewall rules, make sure that:
-
-- PowerShell is running as Administrator, or
-- VS Code is running as Administrator.
-
-The application does not modify Windows Firewall Group Policy settings.
+No additional runtime dependencies are required.
 
 ---
 
 ## 🧪 Testing
 
-The current version has been manually tested for:
+The project includes automated tests covering:
 
-- Valid IPv4 addresses
-- Valid IPv6 addresses
-- Invalid IP addresses
-- Blocking an IP
-- Blocking an already blocked IP
-- Unblocking an IP
-- Unblocking an IP with no existing rule
-- Checking a blocked IP
+- IP address validation
+- Blocking IP addresses
+- Duplicate block handling
+- Unblocking IP addresses
+- Missing firewall rules
+- IP status checks
+- Firewall rule listing
+- CSV event logging
+- Missing log handling
+- Safe subprocess command construction
+
+Run:
+
+    python -m pytest -v
+
+The current test suite contains **13 automated tests**.
+
+## 🔍 Manual Verification
+
+The application was manually tested against a real Windows Defender Firewall environment.
+
+Verified operations include:
+
+- Application startup and exit
+- Invalid IP rejection
 - Checking an unblocked IP
-- Invalid menu selections
-- Exiting the application
+- Blocking an IP with administrator privileges
+- Checking a blocked IP
+- Listing managed firewall rules
+- Handling duplicate block requests
+- Unblocking an IP
+- Confirming an IP is no longer blocked
+- Handling an unblock request when no rule exists
+- Viewing generated event logs
+- Handling an empty rule list
 
-Example test IP:
+The test IP used during verification was:
 
 `203.0.113.50`
 
-This address belongs to the documentation/example address space and is suitable for testing examples without targeting a real public host.
-
----
-
-## 🔍 Verify Firewall Rules Manually
-
-You can inspect a rule created by the application using:
-
-    netsh advfirewall firewall show rule name="PYFW_BLOCK_203.0.113.50"
-
-The command can be used to verify:
-
-- Whether the rule exists
-- Whether it is enabled
-- Direction
-- Profiles
-- Remote IP address
-- Action
-
----
+This address belongs to the documentation-only TEST-NET-3 range and was used strictly for controlled testing.
 
 ## 📁 Project Structure
 
     python-firewall/
-    │
     ├── firewall.py
+    ├── test_firewall.py
+    ├── firewall_events.csv
     ├── README.md
+    ├── FIREWALL_RESEARCH.md
+    ├── LICENSE
     ├── .gitignore
-    └── .git/
+    └── .github/
+        └── workflows/
+            └── python-ci.yml
 
-### Main Files
-
-**`firewall.py`**
-
-Contains the Python Firewall application.
-
-**`README.md`**
-
-Project documentation and usage instructions.
-
-**`.gitignore`**
-
-Prevents unnecessary Python, virtual environment, environment, and editor files from being committed.
+`firewall_events.csv` is generated locally during use and is excluded from Git.
 
 ---
 
-## 🛡️ Security Considerations
+## 🔐 Security Considerations
 
-This application directly modifies Windows Firewall configuration.
+This project is intended for defensive administration and cybersecurity learning.
 
-Only use this tool on systems that you own or are authorized to administer.
+Important considerations:
 
-Incorrect firewall rules can:
+- Firewall changes affect the host system.
+- Administrator privileges are required for rule changes.
+- Incorrect firewall rules can affect network connectivity.
+- Only use the tool on systems you own or are authorized to administer.
+- The application does not bypass Windows security controls.
+- Event logs are stored locally and may contain IP addresses.
 
-- Block legitimate network traffic
-- Disrupt applications
-- Affect remote connectivity
-- Prevent access to required services
+## 📚 Research
 
-Always verify firewall rules after making changes.
+A detailed technical research report for this project is available in:
 
-The project intentionally limits itself to firewall rules created using the `PYFW_BLOCK_<IP>` naming convention.
+`FIREWALL_RESEARCH.md`
 
----
+The report covers:
 
-## 🎯 Learning Objectives
+- Windows Defender Firewall architecture
+- Firewall profiles
+- Inbound and outbound traffic
+- Firewall rule behavior
+- IP-based filtering
+- Ports and protocols
+- `netsh advfirewall`
+- PowerShell firewall management
+- Firewall logging
+- Testing methodology
+- Security considerations
+- Python automation limitations
 
-This project provides practical experience with several areas of cybersecurity and software development.
-
-### Python
-
-- Functions
-- Loops
-- Conditional statements
-- Exception handling
-- User input
-- `subprocess`
-- `ipaddress`
-
-### Windows Security
-
-- Windows Defender Firewall
-- Firewall rules
-- `netsh`
-- Inbound traffic filtering
-- Administrative privileges
-
-### Development
-
-- Git
-- GitHub
-- Version control
-- Repository management
-- Code organization
-- Future CI automation
+The research report is intended to provide the technical background behind the implementation and its security decisions.
 
 ---
 
 ## 🗺️ Roadmap
 
-The project will evolve through future versions.
+Future improvements may include:
 
-### Planned Improvements
+- Better administrator privilege detection
+- Rule export and import
+- More detailed firewall rule inspection
+- Additional logging options
+- Improved CLI argument support
+- Extended automated test coverage
 
-- [ ] Automated unit tests
-- [ ] Firewall action logging
-- [ ] Improved error handling
-- [ ] Firewall rule listing
-- [ ] Rule management and cleanup
-- [ ] Configuration file support
-- [ ] JSON-based logging
-- [ ] Command-line arguments
-- [ ] Enhanced IPv4/IPv6 handling
-- [ ] GitHub Actions CI
-- [ ] Automated code quality checks
-- [ ] Security-focused test cases
-
----
+These features are intentionally outside the current minimum scope.
 
 ## 🤝 Contributing
 
-Contributions, suggestions, and improvements are welcome.
+Contributions, improvements, and security-focused suggestions are welcome.
 
-To contribute:
+Before submitting changes:
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test your changes
-5. Commit your changes
-6. Open a pull request
-
-Please ensure that changes do not introduce unsafe or unauthorized firewall behavior.
+1. Keep the implementation focused and readable.
+2. Add or update automated tests where appropriate.
+3. Verify the application on Windows.
+4. Run the complete test suite.
+5. Update the documentation when behavior changes.
 
 ---
 
 ## 📄 License
 
-This project is currently intended as an educational and personal cybersecurity project.
+This project is licensed under the MIT License.
 
-A formal open-source license may be added in a future release.
+See the `LICENSE` file for the full license text.
+
+## 🆘 Support
+
+If you encounter an issue:
+
+1. Check that Python is installed and available in your PATH.
+2. Run the automated tests with `python -m pytest -v`.
+3. Verify that PowerShell or Command Prompt is running with administrator privileges when modifying firewall rules.
+4. Check the generated `firewall_events.csv` for operation results.
+5. Open an issue in the GitHub repository with the relevant error message and environment details.
 
 ---
 
-## 👤 Author
+## 👨‍💻 Author
 
 **Shreyash Bandekar**
 
-GitHub:
+Cybersecurity | SOC Analysis | Security Engineering
 
-https://github.com/shreyashbandekar
-
----
-
-## ⭐ Support
-
-If you find this project useful or interesting, consider giving the repository a ⭐ on GitHub.
+GitHub: `https://github.com/shreyashbandekar`
 
 ---
 
-<div align="center">
+⭐ If this project was useful for learning Windows Firewall automation, consider starring the repository.
 
-**Python Firewall**
-
-Built with Python 🐍 for Windows security 🛡️
-
-</div>
+---
